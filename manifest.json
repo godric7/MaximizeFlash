@@ -1,0 +1,23 @@
+{
+  "name": "MaxizeFlash",
+  "version": "1.0",
+  "description": "Resize flash elements to fit window size.",
+  "icons": {
+     "128": "maximize-128.png", 
+     "64": "maximize-64.png",
+     "32": "maximize-32.png",
+     "16": "maximize-16.png"
+  },
+  "page_action": {
+    "default_icon": "maximize-icon.png",
+    "default_title": "My Page Action"
+  },
+   "content_scripts": [ {
+   	  "css": [ "style.css" ],
+      "js": [ "content.js" ],
+      "matches": [ "http://*/*", "https://*/*" ],
+      "run_at": "document_end"
+   } ],
+  "background_page": "background.html",
+  "permissions": ["contextMenus", "tabs", "http://*/*", "contextMenus" ]
+}

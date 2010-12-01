@@ -1,0 +1,18 @@
+<html>
+  <script>
+    // Show page action icon on web pages
+	chrome.extension.onRequest.addListener(
+	  function(request, sender, sendResponse) {
+	    if (request.method == "showIcon")
+	      chrome.pageAction.show(sender.tab.id)
+	    else if (request.method == "setMaximizeIcon")
+          chrome.pageAction.setIcon({tabId: sender.tab.id, path: "maximize-icon.png"})
+	    else if (request.method == 'setMinimizeIcon')
+          chrome.pageAction.setIcon({tabId: sender.tab.id, path: "minimize-icon.png"})
+	  });
+	chrome.pageAction.onClicked.addListener(
+	  function(tab) {
+	    chrome.tabs.sendRequest(tab.id, {method: "toogleFlashZones"})
+	  });
+  </script>
+</html>
