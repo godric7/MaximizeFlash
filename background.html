@@ -1,18 +1,40 @@
 <html>
   <script>
-    // Show page action icon on web pages
+    // pageAction toggle status of each tab
+    tabs = {}
+   
+    // (re)Initialise pageAction icon, can be triggered multiple time for one page if it has frames
 	chrome.extension.onRequest.addListener(
 	  function(request, sender, sendResponse) {
-	    if (request.method == "showIcon")
-	      chrome.pageAction.show(sender.tab.id)
-	    else if (request.method == "setMaximizeIcon")
-          chrome.pageAction.setIcon({tabId: sender.tab.id, path: "maximize-32.png"})
-	    else if (request.method == 'setMinimizeIcon')
-          chrome.pageAction.setIcon({tabId: sender.tab.id, path: "minimize-32.png"})
-	  });
-	chrome.pageAction.onClicked.addListener(
-	  function(tab) {
-	    chrome.tabs.sendRequest(tab.id, {method: "toogleFlashZones"})
+	    if (request.method == "initTab") {
+	      if (sender.tab.id in tabs && tabs[sender.tab.id] === true) {
+  	        chrome.pageAction.setIcon({tabId: sender.tab.id, path: "maximize-32.png"})
+            chrome.tabs.sendRequest(sender.tab.id, {method: "unsetFlashZones"})
+          }
+          tabs[sender.tab.id] = false;
+          chrome.pageAction.show(sender.tab.id) 
+        }
+      });
+
+    // remove our tab reference if the tab is removed	 
+    chrome.tabs.onRemoved.addListener(
+      function(tabId) {
+        delete(tabs[tabId])
+      });
+	 
+	// handle pageAction click
+    chrome.pageAction.onClicked.addListener(	  
+ 	  function(tab) {
+ 	    if (tab.id in tabs && tabs[tab.id] === false) {
+          chrome.pageAction.setIcon({tabId: tab.id, path: "minimize-32.png"})         
+          chrome.tabs.sendRequest(tab.id, {method: "setFlashZones"})         
+          tabs[tab.id] = true
+        }
+ 	    else if (tab.id in tabs && tabs[tab.id] === true) {
+	      chrome.pageAction.setIcon({tabId: tab.id, path: "maximize-32.png"})      
+          chrome.tabs.sendRequest(tab.id, {method: "unsetFlashZones"})
+          tabs[tab.id] = false
+        }
 	  });
   </script>
 </html>

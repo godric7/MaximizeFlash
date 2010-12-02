@@ -8,7 +8,6 @@ MAXIMIZED_CLASS =  'maximizeFlashMaxmizedObject'
 FLASHZONE_CLASS = 'maximizeFlashFlashZone'
 NOSCROLLBODY_CLASS = 'noScrollBody'
 
-toogle = false
 imBusy = false
 flashZones = []
 
@@ -30,8 +29,9 @@ function restoreFlash(z) {
 }
 
 
-// Add a click-able div over the flash object (z)
-// Hide Flash object
+// Create a click-able div (z)
+// Put it over the flash object with insertBefore
+// Hide Flash object by applying a custom class
 function setFlashZone(e) {
   var z = document.createElement("div") 
   z.$e = e
@@ -51,18 +51,19 @@ function setFlashZone(e) {
   flashZones.push(z)
 }
 
-// Call setFlashZones for each flash object
+// Call setFlashZones for each REAL flash object
 function setFlashZones() {
   objs = document.querySelectorAll('embed,object')
   for (i in objs) {
     if (objs[i].type == FLASH_TYPE) 
       setFlashZone(objs[i])
   }
-  toogle = true
-  chrome.extension.sendRequest({method: 'setMinimizeIcon'})  
 }
 
-// Remove each flash placeholder, zone, and show flash object
+// Remove each flashZone div
+// If the object was maximized, restore it 
+// Remove hiding class
+// Flush our flashZones references  
 function unsetFlashZones() {
   for (i in flashZones) { 
     z = flashZones[i]
@@ -72,22 +73,20 @@ function unsetFlashZones() {
     removeClass(z.$e, HIDDEN_CLASS)   
   }
   flashZones = []
-  toogle = false 
-  chrome.extension.sendRequest({method: 'setMaximizeIcon'})
 }
 
 // Catch the request sent when the pageaction icon is clicked
 chrome.extension.onRequest.addListener(
   function(request, sender, sendResponse) {
-    if (request.method == 'toogleFlashZones' && imBusy == false) {
-      imBusy = true
-      if (toogle == false)
+    if (imBusy == false) {
+      imBusy = true 
+      if (request.method == 'setFlashZones')
         setFlashZones()
-      else
+      else if (request.method == 'unsetFlashZones')
         unsetFlashZones()
       imBusy = false
     }
   });
 
-chrome.extension.sendRequest({method: 'showIcon'})
+chrome.extension.sendRequest({method: 'initTab'})
 

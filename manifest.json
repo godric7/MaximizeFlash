@@ -4,7 +4,7 @@
   "description": "Resize flash elements to fit window size.",
   "page_action": {
     "default_icon": "maximize-32.png",
-    "default_title": "My Page Action"
+    "default_title": "MaximizeFlash"
   },
   "icons": { 
     "16": "maximize-16.png",
@@ -20,5 +20,5 @@
     "run_at": "document_end"
    }],
   "background_page": "background.html",
-  "permissions": ["contextMenus", "tabs", "http://*/*", "contextMenus" ]
+  "permissions": ["tabs", "http://*/*"]
 }
