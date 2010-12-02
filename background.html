@@ -7,11 +7,12 @@
 	chrome.extension.onRequest.addListener(
 	  function(request, sender, sendResponse) {
 	    if (request.method == "initTab") {
-	      if (sender.tab.id in tabs && tabs[sender.tab.id] === true) {
-  	        chrome.pageAction.setIcon({tabId: sender.tab.id, path: "maximize-32.png"})
-            chrome.tabs.sendRequest(sender.tab.id, {method: "unsetFlashZones"})
-          }
-          tabs[sender.tab.id] = false;
+//	      if (sender.tab.id in tabs && tabs[sender.tab.id] === true) {
+//  	        chrome.pageAction.setIcon({tabId: sender.tab.id, path: "maximize-32.png"})
+ //           chrome.tabs.sendRequest(sender.tab.id, {method: "unsetFlashZones"})
+  //          alert('con')
+  //        }
+   //       tabs[sender.tab.id] = false;
           chrome.pageAction.show(sender.tab.id) 
         }
       });
@@ -25,7 +26,7 @@
 	// handle pageAction click
     chrome.pageAction.onClicked.addListener(	  
  	  function(tab) {
- 	    if (tab.id in tabs && tabs[tab.id] === false) {
+ 	    if ((tab.id in tabs) == false || tabs[tab.id] !== true) {
           chrome.pageAction.setIcon({tabId: tab.id, path: "minimize-32.png"})         
           chrome.tabs.sendRequest(tab.id, {method: "setFlashZones"})         
           tabs[tab.id] = true
