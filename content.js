@@ -8,16 +8,18 @@ MAXIMIZED_CLASS =  'maximizeFlashMaxmizedObject'
 FLASHZONE_CLASS = 'maximizeFlashFlashZone'
 NOSCROLLBODY_CLASS = 'noScrollBody'
 
+toogle = false
+imBusy = false
 flashZones = []
 
 // Resize flash object to fit windows size
 // This is meant to be call by the onclick event
 function maximizeFlash(w) {
-  removeClass(w.target.$e, HIDDEN_CLASS)
-  addClass(w.target.$e, MAXIMIZED_CLASS)
   document.body.appendChild(w.target.$e)
+  addClass(w.target.$e, MAXIMIZED_CLASS) 
+  addClass(document.body, NOSCROLLBODY_CLASS)
+  removeClass(w.target.$e, HIDDEN_CLASS)
   window.scrollTo(0,0)
-  addClass(document.body, NOSCROLLBODY_CLASS) 
 }
 
 // Restore flash object where and how it was
@@ -35,30 +37,29 @@ function setFlashZone(e) {
   z.$e = e
 
   var style = getComputedStyle(e)
-
   z.className = FLASHZONE_CLASS 
-  z.style['background-image'] = 'url(\''+chrome.extension.getURL('maximize-white.png')+'\')'
-  z.style['height'] = style.height
-  z.style['width'] = style.width
+  z.style['background-image'] = 'url(\''+chrome.extension.getURL('maximize-128-white.png')+'\')'
+  z.style['height'] = parseInt(style.height) - 10 + 'px'
+  z.style['width'] = parseInt(style.width) - 10 + 'px'
   z.style['left'] = style.left;
-  z.style['top'] = style.top;
+  z.style['top'] = style.top; 
+  z.style['vertical-align'] = style['vertical-align'];
   z.onclick = maximizeFlash
 
-  e.parentElement.insertBefore(z,e)
+  e.parentElement.insertBefore(z, e)
   addClass(e, HIDDEN_CLASS)
-  return z
+  flashZones.push(z)
 }
 
 // Call setFlashZones for each flash object
 function setFlashZones() {
   objs = document.querySelectorAll('embed,object')
   for (i in objs) {
-    e = objs[i]
-    if (e.type == FLASH_TYPE) 
-      flashZones.push(setFlashZone(e))
+    if (objs[i].type == FLASH_TYPE) 
+      setFlashZone(objs[i])
   }
-  if (flashZones.length != 0)
-    chrome.extension.sendRequest({method: 'setMinimizeIcon'})
+  toogle = true
+  chrome.extension.sendRequest({method: 'setMinimizeIcon'})  
 }
 
 // Remove each flash placeholder, zone, and show flash object
@@ -67,21 +68,24 @@ function unsetFlashZones() {
     z = flashZones[i]
     if (hasClass(z.$e, MAXIMIZED_CLASS))
       restoreFlash(z)
-    removeClass(z.$e, HIDDEN_CLASS)
     z.parentNode.removeChild(z)
+    removeClass(z.$e, HIDDEN_CLASS)   
   }
   flashZones = []
+  toogle = false 
   chrome.extension.sendRequest({method: 'setMaximizeIcon'})
 }
 
 // Catch the request sent when the pageaction icon is clicked
 chrome.extension.onRequest.addListener(
   function(request, sender, sendResponse) {
-    if (request.method == 'toogleFlashZones') {
-      if (flashZones.length == 0)
+    if (request.method == 'toogleFlashZones' && imBusy == false) {
+      imBusy = true
+      if (toogle == false)
         setFlashZones()
       else
         unsetFlashZones()
+      imBusy = false
     }
   });
 

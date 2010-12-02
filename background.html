@@ -6,9 +6,9 @@
 	    if (request.method == "showIcon")
 	      chrome.pageAction.show(sender.tab.id)
 	    else if (request.method == "setMaximizeIcon")
-          chrome.pageAction.setIcon({tabId: sender.tab.id, path: "maximize-icon.png"})
+          chrome.pageAction.setIcon({tabId: sender.tab.id, path: "maximize-32.png"})
 	    else if (request.method == 'setMinimizeIcon')
-          chrome.pageAction.setIcon({tabId: sender.tab.id, path: "minimize-icon.png"})
+          chrome.pageAction.setIcon({tabId: sender.tab.id, path: "minimize-32.png"})
 	  });
 	chrome.pageAction.onClicked.addListener(
 	  function(tab) {
