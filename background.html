@@ -6,15 +6,8 @@
     // (re)Initialise pageAction icon, can be triggered multiple time for one page if it has frames
 	chrome.extension.onRequest.addListener(
 	  function(request, sender, sendResponse) {
-	    if (request.method == "initTab") {
-//	      if (sender.tab.id in tabs && tabs[sender.tab.id] === true) {
-//  	        chrome.pageAction.setIcon({tabId: sender.tab.id, path: "maximize-32.png"})
- //           chrome.tabs.sendRequest(sender.tab.id, {method: "unsetFlashZones"})
-  //          alert('con')
-  //        }
-   //       tabs[sender.tab.id] = false;
+	    if (request.method == "initTab")
           chrome.pageAction.show(sender.tab.id) 
-        }
       });
 
     // remove our tab reference if the tab is removed	 

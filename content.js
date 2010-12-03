@@ -6,7 +6,7 @@ FLASH_TYPE = 'application/x-shockwave-flash'
 HIDDEN_CLASS = 'maximizeFlashHiddenObject'
 MAXIMIZED_CLASS =  'maximizeFlashMaxmizedObject'
 FLASHZONE_CLASS = 'maximizeFlashFlashZone'
-NOSCROLLBODY_CLASS = 'noScrollBody'
+NOSCROLLBODY_CLASS = 'maximizeFlashNoScrollBody'
 
 imBusy = false
 flashZones = []

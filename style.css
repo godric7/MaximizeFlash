@@ -11,6 +11,7 @@
   height: 100% !important;
   width: 100% !important;
   z-index: 9001 !important;
+  background: #fff !important;
 }
 
 .maximizeFlashFlashZone {
@@ -33,10 +34,11 @@
   background-color: #4b7b9f; 
 }
 
-body.noScrollBody {
+body.maximizeFlashNoScrollBody {
   overflow-x: hidden;
   overflow-y: hidden;
 }
+
 
 /*
     #6aadde; 
