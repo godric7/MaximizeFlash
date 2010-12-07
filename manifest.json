@@ -1,6 +1,6 @@
 {
   "name": "MaximizeFlash",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Resize flash elements to fit window size.",
   "page_action": {
     "default_icon": "maximize-32.png",

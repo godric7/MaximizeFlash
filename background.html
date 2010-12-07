@@ -2,33 +2,35 @@
   <script>
     // pageAction toggle status of each tab
     tabs = {}
-   
+
     // (re)Initialise pageAction icon, can be triggered multiple time for one page if it has frames
 	chrome.extension.onRequest.addListener(
 	  function(request, sender, sendResponse) {
 	    if (request.method == "initTab")
-          chrome.pageAction.show(sender.tab.id) 
-      });
-
+          chrome.pageAction.show(sender.tab.id)
+        else if (request.method == "newTab") {
+          chrome.tabs.create({url:chrome.extension.getURL('newTab.html')}, function(tab) {
+            chrome.tabs.sendRequest(sender.tab.id, {method: "sendObject", id: tab.id}) 
+          })
+        }
+      })   
+      
     // remove our tab reference if the tab is removed	 
-    chrome.tabs.onRemoved.addListener(
-      function(tabId) {
-        delete(tabs[tabId])
-      });
+    chrome.tabs.onRemoved.addListener(function(tabId) { delete(tabs[tabId]) })
 	 
 	// handle pageAction click
     chrome.pageAction.onClicked.addListener(	  
  	  function(tab) {
  	    if ((tab.id in tabs) == false || tabs[tab.id] !== true) {
-          chrome.pageAction.setIcon({tabId: tab.id, path: "minimize-32.png"})         
-          chrome.tabs.sendRequest(tab.id, {method: "setFlashZones"})         
+     	  chrome.pageAction.setIcon({tabId: tab.id, path: "minimize-32.png"})      
+          chrome.tabs.sendRequest(tab.id, {method: "setFlashZones"})
           tabs[tab.id] = true
-        }
+		}
  	    else if (tab.id in tabs && tabs[tab.id] === true) {
-	      chrome.pageAction.setIcon({tabId: tab.id, path: "maximize-32.png"})      
+          chrome.pageAction.setIcon({tabId: tab.id, path: "maximize-32.png"})      
           chrome.tabs.sendRequest(tab.id, {method: "unsetFlashZones"})
           tabs[tab.id] = false
         }
-	  });
+	  })
   </script>
 </html>

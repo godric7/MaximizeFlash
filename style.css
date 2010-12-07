@@ -10,8 +10,8 @@
   left: 0px !important;
   height: 100% !important;
   width: 100% !important;
-  z-index: 9001 !important;
   background: #fff !important;
+  z-index: 9999999;
 }
 
 .maximizeFlashFlashZone {
@@ -21,17 +21,10 @@
   background-position: center center;
   background-color: #6aadde;
   background-size: auto 25%;
-//  border: 0px;
   margin: 0px;
-
   display: block;
-  text-align: center;
   position: static;
-}
-
-.maximizeFlashFlashZone:hover {
-//  background-color: #5890d9; 
-  background-color: #4b7b9f; 
+  text-align: center;
 }
 
 body.maximizeFlashNoScrollBody {
@@ -39,6 +32,26 @@ body.maximizeFlashNoScrollBody {
   overflow-y: hidden;
 }
 
+.maximizeFlashButtonV {
+  position: relative;
+  display: block;
+  margin: 0 auto;
+  width: 25%;  
+}
+
+.maximizeFlashButtonH {
+  position: relative;
+  display:inline; 
+  height: 25%;
+}
+
+.maximizeFlashButtonV:hover {
+  opacity: 0.5;
+}
+
+.maximizeFlashButtonH:hover {
+  opacity: 0.5;
+}
 
 /*
     #6aadde; 

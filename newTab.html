@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>MaximizeFlash</title>
+    <script>
+      function addClass(e,c) {if (!this.hasClass(e,c)) e.className+=' '+c;}
+      function hasClass(e,c) {return e.className.match(new RegExp('(\\s|^)'+c+'(\\s|$)'));}
+      MAXIMIZED_CLASS =  'maximizeFlashMaxmizedObject'
+      tabID = 0
+ 
+      // Append style.css 
+      s = document.createElement('link')
+      s.rel = 'stylesheet'
+      s.type = 'text/css'
+      s.href = chrome.extension.getURL('style.css')
+      document.head.appendChild(s)
+
+      // Get current tab id
+      chrome.tabs.getCurrent(function (tab) {
+        tabID = tab.id
+      })
+      
+      // Listen for element, place element in body, add maximized class
+      chrome.extension.onRequest.addListener(
+       function(request, sender, sendResponse) {
+         if (request.method == 'setObject' && request.id == tabID) {
+           document.body.innerHTML = request.object
+           addClass(document.body.children[0], MAXIMIZED_CLASS)
+         }})
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

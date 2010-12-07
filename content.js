@@ -7,17 +7,31 @@ HIDDEN_CLASS = 'maximizeFlashHiddenObject'
 MAXIMIZED_CLASS =  'maximizeFlashMaxmizedObject'
 FLASHZONE_CLASS = 'maximizeFlashFlashZone'
 NOSCROLLBODY_CLASS = 'maximizeFlashNoScrollBody'
+FLASHZONE_BUTTON_VERTICAL_CLASS = 'maximizeFlashButtonV'
+FLASHZONE_BUTTON_HORIZONTAL_CLASS = 'maximizeFlashButtonH'
 
 imBusy = false
 flashZones = []
+flashToOpenIntoTab = null
+
+// Open Flash element in a new tab
+function newFlashTab(w) {
+  z = w.target.parentNode
+  
+  host = window.location.protocol+'//'+window.location.host
+  flashToOpenIntoTab = z.$e.outerHTML.replace(/"\/(.*?)"/g, '"'+host+'/$1"')
+  chrome.extension.sendRequest({method: 'newTab'})
+}
 
 // Resize flash object to fit windows size
 // This is meant to be call by the onclick event
 function maximizeFlash(w) {
-  document.body.appendChild(w.target.$e)
-  addClass(w.target.$e, MAXIMIZED_CLASS) 
+  z = w.target.parentNode
+
+  document.body.appendChild(z.$e)
+  addClass(z.$e, MAXIMIZED_CLASS) 
   addClass(document.body, NOSCROLLBODY_CLASS)
-  removeClass(w.target.$e, HIDDEN_CLASS)
+  removeClass(z.$e, HIDDEN_CLASS)
   window.scrollTo(0,0)
 }
 
@@ -28,24 +42,46 @@ function restoreFlash(z) {
   z.parentNode.insertBefore(z.$e, z.nextSibling)
 }
 
-
 // Create a click-able div (z)
 // Put it over the flash object with insertBefore
 // Hide Flash object by applying a custom class
 function setFlashZone(e) {
+  var style = getComputedStyle(e)
+  _w = parseInt(style.width)
+  _h = parseInt(style.height)
+  if (_w < 10 || _h < 10)
+    return
+    
   var z = document.createElement("div") 
   z.$e = e
 
-  var style = getComputedStyle(e)
   z.className = FLASHZONE_CLASS 
-  z.style['background-image'] = 'url(\''+chrome.extension.getURL('maximize-128-white.png')+'\')'
-  z.style['height'] = parseInt(style.height) - 10 + 'px'
-  z.style['width'] = parseInt(style.width) - 10 + 'px'
+  z.style['height'] = _h - 10 + 'px'
+  z.style['width'] = _w - 10 + 'px'
   z.style['left'] = style.left;
   z.style['top'] = style.top; 
-  z.style['vertical-align'] = style['vertical-align'];
-  z.onclick = maximizeFlash
 
+  z.$m = z.$t = document.createElement('img')
+  z.$t = document.createElement('img') 
+  z.$m.src = chrome.extension.getURL('maximize-white.png')
+  z.$t.src = chrome.extension.getURL('newtab-white.png')
+  z.$m.onclick = maximizeFlash 
+  z.$t.onclick = newFlashTab
+
+  if (_h > _w) {
+    z.$m.className = z.$t.className = FLASHZONE_BUTTON_VERTICAL_CLASS
+    z.$m.style['top'] = (_h / 2) - (_h * 0.35) + 'px'
+    z.$t.style['top'] = (_h / 2) - (_h * 0.20) + 'px'
+  }
+  else {
+    z.$m.className = z.$t.className = FLASHZONE_BUTTON_HORIZONTAL_CLASS
+    z.$t.style['margin-left'] = _h * 0.10 + 'px';
+    z.$m.style['top'] = (_h / 2) - (_h * 0.25 / 2) + 'px'
+    z.$t.style['top'] = (_h / 2) - (_h * 0.25 / 2) + 'px'
+  }
+
+  z.appendChild(z.$m)
+  z.appendChild(z.$t)  
   e.parentElement.insertBefore(z, e)
   addClass(e, HIDDEN_CLASS)
   flashZones.push(z)
@@ -54,7 +90,7 @@ function setFlashZone(e) {
 // Call setFlashZones for each REAL flash object
 function setFlashZones() {
   objs = document.querySelectorAll('embed,object')
-  for (i in objs) {
+  for (i in objs) {  
     if (objs[i].type == FLASH_TYPE) 
       setFlashZone(objs[i])
   }
@@ -84,8 +120,12 @@ chrome.extension.onRequest.addListener(
         setFlashZones()
       else if (request.method == 'unsetFlashZones')
         unsetFlashZones()
-      imBusy = false
+      imBusy = false     
     }
+    if (request.method == 'sendObject' && flashToOpenIntoTab != null) {
+	  chrome.extension.sendRequest({method: 'setObject', id: request.id, object: flashToOpenIntoTab})
+	  flashToOpenIntoTab = null
+	}
   });
 
 chrome.extension.sendRequest({method: 'initTab'})
